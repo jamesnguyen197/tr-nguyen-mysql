@@ -52,20 +52,20 @@ int main(int argc, char *argv[]) {
         perror("listen");
         exit(EXIT_FAILURE);
     }
-    printf("Listening on port %d...\n", port);
+    // printf("Listening on port %d...\n", port);
     
     while(1) {
         // Check if MariaDB server is running locally
         if (is_mariadb_running_locally()) {
             // The MariaDB server is running, so set the NLB target group to healthy
-            printf("MariaDB server is running locally\n");
+            // printf("MariaDB server is running locally\n");
             if (setsockopt(server_socket, SOL_SOCKET, SO_KEEPALIVE, &opt, sizeof(opt)) < 0) {
                 perror("setsockopt");
                 exit(EXIT_FAILURE);
             }
         } else {
             // The MariaDB server is not running, so set the NLB target group to unhealthy
-            printf("MariaDB server is not running locally\n");
+            // printf("MariaDB server is not running locally\n");
             if (setsockopt(server_socket, SOL_SOCKET, SO_KEEPALIVE, NULL, 0) < 0) {
                 perror("setsockopt");
                 exit(EXIT_FAILURE);
@@ -77,15 +77,15 @@ int main(int argc, char *argv[]) {
             perror("accept");
             exit(EXIT_FAILURE);
         }
-        printf("Connection accepted from %s:%d\n", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
+        // printf("Connection accepted from %s:%d\n", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
         
         // Read message from the client
         valread = read( new_socket , buffer, 1024);
-        printf("Received message: %s\n",buffer );
+        // printf("Received message: %s\n",buffer );
         
         // Send message back to the client
         send(new_socket , hello , strlen(hello) , 0 );
-        printf("Hello message sent\n");
+        // printf("Hello message sent\n");
         close(new_socket);
     }
     return 0;
