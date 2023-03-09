@@ -1,10 +1,10 @@
 [Unit]
 Description=ListenPortMariaDB
-After=network.target
+After=mariadb.service network.target
 
 [Service]
 Type=simple
-ExecStart=/home/ec2-user/ListenPortMariaDB
+ExecStart=/home/ec2-user/ListenPortMariaDB 13306
 Restart=always
 
 [Install]
