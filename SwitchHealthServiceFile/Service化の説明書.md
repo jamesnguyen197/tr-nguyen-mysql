@@ -68,3 +68,7 @@ ListenPortMariaDB.c をサービス化するには、以下の手順に従うこ
     ```
 
 これで、ListenPortMariaDBは自動的に起動し、ProcessがKillされても自動的に再起動されます。また、MariaDBが起動するたびに ListenPortMariaDBも起動するように設定されます。
+
+nguyen-1 で ListenPortMariaDBを service化したので、nguyen-1 の Instanceを再起動しても Target Groupで nguyen-1 は Healthyの状態です。
+<div style="text-align: center;">
+<img src="./nguyen-1Healthy.png" width="100%"/></div>
