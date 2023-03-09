@@ -1,4 +1,4 @@
-# ListenPortMariaDBの Service化
+# Health Checker の Service化
 
 商用サービスの運用で使うhealth checker には下記の要件もあります。
 * なにかの原因でprocessがkillされてもすぐに再起動して health checkの機能を停めません。
@@ -15,7 +15,7 @@ ListenPortMariaDB.c をサービス化するには、以下の手順に従うこ
     sudo cp ./healthchecker /opt/metamoji/bin/.
     ```
 
-2. ```/etc/systemd/system/``` ディレクトリに ListenPortMariaDB.service という名前の新しいサービスファイルを作成します。**[サービスファイル](./healthchecker.service)** の内容は以下のようになります。
+2. ```/etc/systemd/system/``` ディレクトリに healthchecker.service という名前の新しいサービスファイルを作成します。**[サービスファイル](./healthchecker.service)** の内容は以下のようになります。
     ```
     [Unit]
     Description=healthchecker
@@ -23,18 +23,18 @@ ListenPortMariaDB.c をサービス化するには、以下の手順に従うこ
 
     [Service]
     Type=simple
-    ExecStart=/usr/local/bin/healthchecker 13306
+    ExecStart=/opt/metamoji/bin/healthchecker 13306
     Restart=always
 
     [Install]
     WantedBy=multi-user.target
     ```
 
-* After=mariadb.service network.target は、ListenPortMariaDB が実行される前に、MariaDB とネットワークが起動していることを保証します。
+* After=mariadb.service network.target は、healthchecker が実行される前に、MariaDB とネットワークが起動していることを保証します。
 
 * Type=simple は、healthchecker がバックグラウンドで実行される簡単なサービスであることを指定します。
 
-* ExecStart=/home/ec2-user/healthchecker 13306 は、ポート 13306 で healthchecker を実行するコマンドを指定します。
+* ExecStart=/opt/metamoji/bin/healthchecker 13306 は、ポート 13306 で healthchecker を実行するコマンドを指定します。
 
 * Restart=always は、healthchecker が processが killされても自動的に再起動するように設定します。
 
@@ -75,13 +75,13 @@ ListenPortMariaDB.c をサービス化するには、以下の手順に従うこ
     Mar 09 07:08:44 ip-10-0-147-166.ec2.internal systemd[1]: Stopped healthchecker.
     ```
 
-    このため、mariadbと ListenPortMariaDBを自動起動するように設定します。
+    このため、mariadbと healthchecker を自動起動するように設定します。
     ```
     sudo systemctl start mariadb healthchecker
     ```
 
-これで、ListenPortMariaDBは自動的に起動し、ProcessがKillされても自動的に再起動されます。また、MariaDBが起動するたびに ListenPortMariaDBも起動するように設定されます。
+これで、healthchecker は自動的に起動し、ProcessがKillされても自動的に再起動されます。また、MariaDBが起動するたびに healthchecker も起動するように設定されます。
 
-nguyen-1 で ListenPortMariaDBを service化したので、nguyen-1 の Instanceを再起動しても Target Groupで nguyen-1 は Healthyの状態です。
+nguyen-1 で healthcheckerを service化したので、nguyen-1 の Instanceを再起動しても Target Groupで nguyen-1 は Healthyの状態です。
 <div style="text-align: center;">
 <img src="./nguyen-1Healthy.png" width="100%"/></div>
