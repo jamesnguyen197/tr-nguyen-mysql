@@ -7,13 +7,25 @@
 #include <errno.h>
 
 int is_mariadb_running_locally() {
-    // Use system() function to execute the "systemctl status mariadb" command
-    int ret = system("systemctl status mariadb > /dev/null");
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock == -1) {
+        perror("socket");
+        exit(EXIT_FAILURE);
+    }
+
+    struct sockaddr_in addr;
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK); // localhost
+    addr.sin_port = htons(3306);
+
+    int ret = connect(sock, (struct sockaddr*)&addr, sizeof(addr));
     if (ret == 0) {
-        // The MariaDB server is running
+        // Connection successful, so MariaDB server is running
+        close(sock);
         return 1;
     } else {
-        // The MariaDB server is not running
+        // Connection unsuccessful, so MariaDB server is not running
+        close(sock);
         return 0;
     }
 }
