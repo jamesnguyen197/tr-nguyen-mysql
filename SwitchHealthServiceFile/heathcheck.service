@@ -4,7 +4,7 @@ After=mariadb.service network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/healthchecker 13306
+ExecStart=/opt/metamoji/bin/healthchecker 13306
 Restart=always
 
 [Install]

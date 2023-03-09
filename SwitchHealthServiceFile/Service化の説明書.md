@@ -9,10 +9,10 @@ ListenPortMariaDB.c をサービス化するには、以下の手順に従うこ
     ```
     gcc -o healthchecker ListenPortMariaDB.c
     ```
-    **※** healthchecker は ```/usr/local/bin/``` までコピーします
+    **※** healthchecker は ```/opt/metamoji/bin/``` までコピーします
     。
     ```
-    sudo cp ./healthchecker /usr/local/bin/.
+    sudo cp ./healthchecker /opt/metamoji/bin/.
     ```
 
 2. ```/etc/systemd/system/``` ディレクトリに ListenPortMariaDB.service という名前の新しいサービスファイルを作成します。**[サービスファイル](./healthchecker.service)** の内容は以下のようになります。
@@ -49,51 +49,35 @@ ListenPortMariaDB.c をサービス化するには、以下の手順に従うこ
     ```
     [ec2-user@ip-10-0-147-166 ~]$ sudo systemctl status mariadb healthchecker
     ● mariadb.service - MariaDB 10.5 database server
-    Loaded: loaded (/usr/lib/systemd/system/mariadb.service; enabled; vendor pres                                                                                                 et: disabled)
-    Active: inactive (dead) since Thu 2023-03-09 06:34:41 UTC; 17s ago
-        Docs: man:mariadbd(8)
-            https://mariadb.com/kb/en/library/systemd/
-    Process: 3057 ExecStart=/usr/libexec/mariadbd --basedir=/usr $MYSQLD_OPTS $_WS                                                                                                 REP_NEW_CLUSTER (code=exited, status=0/SUCCESS)
-    Main PID: 3057 (code=exited, status=0/SUCCESS)
-    Status: "MariaDB server is down"
-
-    Mar 09 05:30:28 ip-10-0-147-166.ec2.internal systemd[1]: Starting MariaDB 10....
-    Mar 09 05:30:29 ip-10-0-147-166.ec2.internal mariadb-prepare-db-dir[2999]: Da...
-    Mar 09 05:30:30 ip-10-0-147-166.ec2.internal mariadbd[3057]: 2023-03-09  5:30...
-    Mar 09 05:30:30 ip-10-0-147-166.ec2.internal systemd[1]: Started MariaDB 10.5...
-    Mar 09 06:34:41 ip-10-0-147-166.ec2.internal systemd[1]: Stopping MariaDB 10....
-    Mar 09 06:34:41 ip-10-0-147-166.ec2.internal systemd[1]: Stopped MariaDB 10.5...
-
-    ● healthchecker.service - healthchecker
-    Loaded: loaded (/etc/systemd/system/healthchecker.service; enabled; vendor preset: disabled)
-   Active: inactive (dead)
-    Hint: Some lines were ellipsized, use -l to show in full.
-    [ec2-user@ip-10-0-147-166 ~]$ sudo systemctl status mariadb healthchecker
-    ● mariadb.service - MariaDB 10.5 database server
     Loaded: loaded (/usr/lib/systemd/system/mariadb.service; enabled; vendor preset: disabled)
-    Active: inactive (dead) since Thu 2023-03-09 06:34:41 UTC; 20s ago
+    Active: inactive (dead) since Thu 2023-03-09 07:08:44 UTC; 25s ago
         Docs: man:mariadbd(8)
             https://mariadb.com/kb/en/library/systemd/
-    Process: 3057 ExecStart=/usr/libexec/mariadbd --basedir=/usr $MYSQLD_OPTS $_WSREP_NEW_CLUSTER (code=exited, status=0/SUCCESS)
-    Main PID: 3057 (code=exited, status=0/SUCCESS)
+    Process: 4474 ExecStart=/usr/libexec/mariadbd --basedir=/usr $MYSQLD_OPTS $_WSREP_NEW_CLUSTER (code=exited, status=0/SUCCESS)
+    Main PID: 4474 (code=exited, status=0/SUCCESS)
     Status: "MariaDB server is down"
 
-    Mar 09 05:30:28 ip-10-0-147-166.ec2.internal systemd[1]: Starting MariaDB 10.5 database server...
-    Mar 09 05:30:29 ip-10-0-147-166.ec2.internal mariadb-prepare-db-dir[2999]: Database MariaDB is probably initialized in /var/lib/mysql already, nothing is done.
-    Mar 09 05:30:30 ip-10-0-147-166.ec2.internal mariadbd[3057]: 2023-03-09  5:30:30 0 [Note] /usr/libexec/mariadbd (mysqld 10.5.10-MariaDB) starting as process 3057 ...
-    Mar 09 05:30:30 ip-10-0-147-166.ec2.internal systemd[1]: Started MariaDB 10.5 database server.
-    Mar 09 06:34:41 ip-10-0-147-166.ec2.internal systemd[1]: Stopping MariaDB 10.5 database server...
-    Mar 09 06:34:41 ip-10-0-147-166.ec2.internal systemd[1]: Stopped MariaDB 10.5 database server.
+    Mar 09 06:37:44 ip-10-0-147-166.ec2.internal systemd[1]: Starting MariaDB 10.5 database server...
+    Mar 09 06:37:44 ip-10-0-147-166.ec2.internal mariadb-prepare-db-dir[4435]: Database MariaDB is probably initialized in /var/lib/mysql already, nothing is done.
+    Mar 09 06:37:44 ip-10-0-147-166.ec2.internal mariadbd[4474]: 2023-03-09  6:37:44 0 [Note] /usr/libexec/mariadbd (mysqld 10.5.10-MariaDB) starting as process 4474 ...
+    Mar 09 06:37:44 ip-10-0-147-166.ec2.internal systemd[1]: Started MariaDB 10.5 database server.
+    Mar 09 07:08:44 ip-10-0-147-166.ec2.internal systemd[1]: Stopping MariaDB 10.5 database server...
+    Mar 09 07:08:44 ip-10-0-147-166.ec2.internal systemd[1]: Stopped MariaDB 10.5 database server.
 
     ● healthchecker.service - healthchecker
     Loaded: loaded (/etc/systemd/system/healthchecker.service; enabled; vendor preset: disabled)
-    Active: inactive (dead)
+    Active: inactive (dead) since Thu 2023-03-09 07:08:44 UTC; 26s ago
+    Main PID: 4558 (code=killed, signal=TERM)
 
+    Mar 09 06:37:44 ip-10-0-147-166.ec2.internal systemd[1]: Started healthchecker.
+    Mar 09 07:01:39 ip-10-0-147-166.ec2.internal systemd[1]: Current command vanished from the unit file, execution of the command list won't be resumed.
+    Mar 09 07:08:44 ip-10-0-147-166.ec2.internal systemd[1]: Stopping healthchecker...
+    Mar 09 07:08:44 ip-10-0-147-166.ec2.internal systemd[1]: Stopped healthchecker.
     ```
 
     このため、mariadbと ListenPortMariaDBを自動起動するように設定します。
     ```
-    sudo systemctl start mariadb ListenPortMariaDB
+    sudo systemctl start mariadb healthchecker
     ```
 
 これで、ListenPortMariaDBは自動的に起動し、ProcessがKillされても自動的に再起動されます。また、MariaDBが起動するたびに ListenPortMariaDBも起動するように設定されます。
