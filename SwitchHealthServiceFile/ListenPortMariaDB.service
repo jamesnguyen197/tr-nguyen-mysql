@@ -1,0 +1,11 @@
+[Unit]
+Description=ListenPortMariaDB
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/home/ec2-user/ListenPortMariaDB
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
