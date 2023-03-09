@@ -66,3 +66,36 @@ healthche 6816 ec2-user    3u  IPv4  37660      0t0  TCP *:13306 (LISTEN)
 ```
 
 現在、Mariadb は 3306 ポートで働いています。healthchecker は 13306 ポートで働いています。つまり、localhost:3306 ポートの接続確認ができました。
+
+また、**[Health Checkerの Service化](https://github.com/metamoji/tr-nguyen-mysql/blob/main/SwitchHealthServiceFile/Service%E5%8C%96%E3%81%AE%E8%AA%AC%E6%98%8E%E6%9B%B8.md)** により、以上のプログラムをサービス化してみます。
+
+```
+[ec2-user@ip-10-0-147-166 ~]$ sudo systemctl status mariadb healthchecker
+● mariadb.service - MariaDB 10.5 database server
+   Loaded: loaded (/usr/lib/systemd/system/mariadb.service; enabled; vendor preset: disabled)
+   Active: active (running) since Thu 2023-03-09 08:32:31 UTC; 9min ago
+     Docs: man:mariadbd(8)
+           https://mariadb.com/kb/en/library/systemd/
+ Main PID: 6728 (mariadbd)
+   Status: "Taking your SQL requests now..."
+   CGroup: /system.slice/mariadb.service
+           └─6728 /usr/libexec/mariadbd --basedir=/usr
+
+Mar 09 08:32:31 ip-10-0-147-166.ec2.internal systemd[1]: Starting MariaDB 10.5 database server...
+Mar 09 08:32:31 ip-10-0-147-166.ec2.internal mariadb-prepare-db-dir[6689]: Database MariaDB is probably initialized in /var/lib/mysql already, nothing is done.
+Mar 09 08:32:31 ip-10-0-147-166.ec2.internal mariadbd[6728]: 2023-03-09  8:32:31 0 [Note] /usr/libexec/mariadbd (mysqld 10.5.10-MariaDB) starting as process 6728 ...
+Mar 09 08:32:31 ip-10-0-147-166.ec2.internal systemd[1]: Started MariaDB 10.5 database server.
+
+● healthchecker.service - healthchecker
+   Loaded: loaded (/etc/systemd/system/healthchecker.service; enabled; vendor preset: disabled)
+   Active: active (running) since Thu 2023-03-09 08:38:09 UTC; 4min 18s ago
+ Main PID: 6939 (healthchecker)
+   CGroup: /system.slice/healthchecker.service
+           └─6939 /opt/metamoji/bin/healthchecker 13306
+
+Mar 09 08:38:09 ip-10-0-147-166.ec2.internal systemd[1]: Started healthchecker.
+```
+実行している状態です。また、Target Groupで確認するとき、instance nguyen-1 が Healthyになります。
+
+<div style="text-align: center;">
+<img src="./Image/auto-nguyen-1-healthy.png" width="100%"/></div>
