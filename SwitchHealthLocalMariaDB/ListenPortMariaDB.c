@@ -26,6 +26,12 @@ int main(int argc, char *argv[]) {
     int addrlen = sizeof(address);
     char buffer[1024] = {0};
     char *hello = "Hello from server";
+    int debug = 0;
+
+    // Check if --debug option is specified
+    if (argc == 3 && strcmp(argv[2], "--debug") == 0) {
+        debug = 1;
+    }
        
     // Create socket file descriptor
     if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
@@ -52,12 +58,18 @@ int main(int argc, char *argv[]) {
         perror("listen");
         exit(EXIT_FAILURE);
     }
-    // printf("Listening on port %d...\n", port);
+
+    if (debug) {
+        printf("Listening on port %d...\n", port);
+    }
     
     while(1) {
         // Check if MariaDB server is running locally
         if (is_mariadb_running_locally()) {
             // The MariaDB server is running, so set the NLB target group to healthy
+            if (debug) {
+                printf("MariaDB server is running locally\n");
+            }
             // printf("MariaDB server is running locally\n");
             if (setsockopt(server_socket, SOL_SOCKET, SO_KEEPALIVE, &opt, sizeof(opt)) < 0) {
                 perror("setsockopt");
@@ -65,7 +77,9 @@ int main(int argc, char *argv[]) {
             }
         } else {
             // The MariaDB server is not running, so set the NLB target group to unhealthy
-            // printf("MariaDB server is not running locally\n");
+            if (debug) {
+                printf("MariaDB server is not running locally\n");
+            }
             if (setsockopt(server_socket, SOL_SOCKET, SO_KEEPALIVE, NULL, 0) < 0) {
                 perror("setsockopt");
                 exit(EXIT_FAILURE);

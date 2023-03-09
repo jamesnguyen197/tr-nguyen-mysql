@@ -49,3 +49,9 @@ sudo systemctl stop mariadb
 nguyen-1 の例と同様にlocal は nguyen-2 として、同じ手順で行います。MariaDB Server を開始したら、Healthy の状態になり、MariaDB Server が止まったら、Unhealthy の状態になります。この段階は省略します。
 
 Target Groupをクリックして NLB を選択すると、登録した Target で 各Instance を確認できます。
+
+**追加:** silent な動作をdefaultにします。ListenPortMariaDB が動いていることを確認したい場合、```--debug``` を後尾に追加します。例えば、
+```
+./ListenPortMariaDB 13306 --debug &
+```
+を入力すると、以下に MariaDB server is running locally のメッセージが表示されます。
