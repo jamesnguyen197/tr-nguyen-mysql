@@ -1,26 +1,29 @@
 # MariaDBのNLB分散構成をつくる
 **[以前のHealth Check をサービス化しました](https://github.com/metamoji/tr-nguyen-mysql/blob/main/SwitchHealthServiceFile/Service%E5%8C%96%E3%81%AE%E8%AA%AC%E6%98%8E%E6%9B%B8.md)**。MariaDB の NLB 分散の構成を作成します。
 
-Load Balancer の Health Check が効けば、MariaDB 障害を自動検知して切り離しもできます。しかし、同じ 13306 ポートで通ると、**[NLB の Health Check が MariaDB が接続ホストをブロックしてしまいます](https://qiita.com/araryo/items/09eb79c59be7e3961bc0)**。このため、MariaDB のポートを Health Check 以外のポートに変更しなければなりません。具体的には、MariaDB のポートは 3306 に設けます。
+Load Balancer の Health Check が効けば、MariaDB 障害を自動検知して切り離しもできます。しかし、同じ 13306 ポートで通ると、**[NLB の Health Check が MariaDB が接続ホストをブロックしてしまいます](https://qiita.com/araryo/items/09eb79c59be7e3961bc0)**。このため、MariaDB のポートを Health Check 以外のポートに変更しなければなりません。具体的には、MariaDB のポートはデフォールトの 3306 に設けます。
 
 <div style="text-align: center;">
-<img src="./Image/Figure.png" width="90%"/></div>
+<img src="./Image/Figure.png" width="50%"/></div>
 
 まず、Target Groupで 3306 ポートを作成します。MariaDB の Target Group を選択して Health checks タブで編集します。
 
 <div style="text-align: center;">
 <img src="./Image/1.png" width="90%"/></div>
 
-そして、Health Check の設定では、通常はサービスの 13306 ポートを使用して行われます。しかし、新しいポート（例えば 3306 ポート）を開いた場合、3306 ポートは MariaDB で実施し、13306 ポートで Health Check を実行するように指示する必要があります。それが、新しいポートの「オーバーライド」設定を行う理由です。以下と同様に設定をします。
+そして、Health Check の設定では、通常はサービスの 13306 ポートを使用して行われます。しかし、新しいポート（例えば デフォルト 3306 ポート）を開いた場合、3306 ポートは MariaDB で実施し、13306 ポートで Health Check を実行するように指示する必要があります。それが、新しいポートの「オーバーライド」設定を行う理由です。以下と同様に設定をします。
 
 <div style="text-align: center;">
 <img src="./Image/2.png" width="90%"/></div>
 
-```intern-nlb-sg``` で 13306 ポートは、現在、```0.0.0.0/0``` で設定しています。つまり、すべてのIPアドレスに接続します。今回、すべてのIPアドレスを接続するだけではなく、具体的な IP アドレスに絞ってみます。inbound の 13306 の source は NLB ですが、NLB にはsecurity group がつかないのでその指定はできません。それなら subnet で指定したいですが、subnet-id は source に指定できません。対策として、subnet の CIDR で指定する ```10.0.128.0/20``` と ```10.0.144.0/20```です。
+AWS 環境で ```nguyen-1``` と ```nguyen-2``` を稼働させています。それらをセキュリティグループにまとめて、 MariaDB instanceのセキュリティグループで 13306 ポートは、現在、```0.0.0.0/0``` で設定しています。つまり、すべてのIPアドレスに接続します。今回、すべてのIPアドレスを接続するだけではなく、具体的な IP アドレスに絞ってみます。inbound の 13306 の source は NLB ですが、NLB にはsecurity group がつかないのでその指定はできません。それなら subnet で指定したいですが、subnet-id は source に指定できません。対策として、subnet の CIDR で指定する ```10.0.128.0/20``` と ```10.0.144.0/20```です。
+
+<div style="text-align: center;">
+<img src="./Image/CIDR.png" width="90%"/></div>
 
 Network Mapping は、EC2のプライベートIPアドレスを指定するために使用されます。これにより、Load Balancer がトラフィックを受け取った後、EC2インスタンスにリクエストを送信するための正しい宛先を特定することができます。また、Private IPv4 addressは、セキュリティ上の理由から、EC2インスタンスのプライベートIPアドレスを公開しなくて済むようにするためにも使用されます。
 
-AWSの NLB がIP パケットを転送するときに、IPパケットをそのまま中継するために使用されます。つまり、NLBはネットワークトラフィックを単純に通して、処理の遅延を最小限にすることができます。NLBは土管なので、元のIPは伝えていますが、```security group-id```が動かなくなります。このため、```kawanoy-1``` から 3306ポートを開けて、```10.0.11.33/32```を追加しました。この結果、疎通しました。
+AWSの NLB がIP パケットを転送するときに、IPパケットをそのまま中継するために使用されます。つまり、NLBはネットワークトラフィックを単純に通して、処理の遅延を最小限にすることができます。NLBは土管なので、元のIPは伝えていますが、```security group-id``` が動かなくなります。このため、```kawanoy-1``` (App) から 3306ポートを開けて、プライベート IP アドレス ```10.0.11.33/32``` を追加しました。この結果、疎通しました。
 ```
 [ec2-user@ip-10-0-11-33 ~]$ curl -v telnet://10.0.147.166:13306
 *   Trying 10.0.147.166:13306...
@@ -48,10 +51,12 @@ Address: 10.0.147.95
 
 しかし、これは Amazon 側の都合で長期的には変わってしまう可能性があります。例えば、AutoScale やメンテナンスや機器故障などです。このため、 subnet の CIDR で範囲を手広く source に指定します。
 
-3306 ポートも上と同様に設定します。```intern-nlb-sg```のインバウンドで以下の図と同様に設定します。
+3306 ポートも上と同様に設定します。MariaDB instanceのセキュリティグループの ```intern-nlb-sg``` のインバウンドで以下の図と同様に設定します。
 
 <div style="text-align: center;">
 <img src="./Image/3.png" width="100%"/></div>
+
+```Port: 13306, Source: 10.0.11.33/32, describe: from kawanoy-1``` は Health Check Service のデバッグ用で NLB 分散 MariaDB には不要です。また、```Port:22, Source: sg-xxxxxx, describe: to nguyen-1 and nguyen-2``` は ```kawanoy-1``` を中継して、SSH で ```nguyen-1``` と ```nguyen-2``` にアクセスしているので、NLB 分散 MariaDBに関係がありません。
 
 ```
 [ec2-user@ip-10-0-11-33 ~]$ curl -v telnet://10.0.147.166:3306

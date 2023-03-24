@@ -50,9 +50,7 @@ mysql> SELECT user,host FROM mysql.user;
 ## **MariaDB ユーザーに権限を渡す**
 作成された新ユーザーには、データベースを管理する権限も MariaDB にアクセスする権限もありません。そのとき、すべての権限を metamoji に渡します。
 ```
-GRANT ALL PRIVILEGES ON *.* TO 'metamoji'@'ip-10-0-11-33.ec2.internal' IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON *.* TO 'metamoji'@'ip-10-0-147-166.ec2.internal' IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON *.* TO 'metamoji'@'ip-10-0-157-33.ec2.internal' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON *.* TO 'metamoji'@'%' IDENTIFIED BY 'password';
 ```
 
 現在、```nguyen-1``` でDBにアクセスします。```nguyen-1``` と ```nguyen-2``` と ```kawanoy-1``` から各DBにアクセスしたい場合、すべてのIPアドレスにアクセス権限が必要です。
