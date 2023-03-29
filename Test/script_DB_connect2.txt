@@ -1,0 +1,9 @@
+DELIMITER //
+CREATE PROCEDURE infinite_loop()
+ BEGIN
+  WHILE 1 DO
+   SELECT name FROM metamoji_test;
+   SELECT SLEEP(1) INTO @dummy;
+  END WHILE;
+ END //
+DELIMITER ;
