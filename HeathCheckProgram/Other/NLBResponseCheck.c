@@ -41,6 +41,7 @@ int checkNLBHealth(const char* host, const char* port) {
   }
 
   freeaddrinfo(result);
+  close(sfd);
   return 0;
 }
 
