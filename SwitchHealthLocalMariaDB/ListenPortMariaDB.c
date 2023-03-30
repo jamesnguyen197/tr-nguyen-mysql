@@ -114,5 +114,8 @@ int main(int argc, char *argv[]) {
         // printf("Hello message sent\n");
         close(new_socket);
     }
+        
+    // Close the socket after the while loop
+    close(server_socket);
     return 0;
 }
