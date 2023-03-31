@@ -5,7 +5,9 @@
 * Instance の restart や reboot が上記の原因でも、自動起動しなければなりません。
 
 ListenPortMariaDB.c をサービス化するには、以下の手順に従うことができます。
-1. ListenPortMariaDB.c をコンパイルして実行可能ファイルを作成します。
+1. ListenPortMariaDB.c または healthchecker.py をコンパイルして実行可能ファイルを作成します。
+   
+    **C言語のファイルを導入すれば、**
     ```
     gcc -o healthchecker ListenPortMariaDB.c
     ```
@@ -15,7 +17,14 @@ ListenPortMariaDB.c をサービス化するには、以下の手順に従うこ
     sudo cp ./healthchecker /opt/metamoji/bin/.
     ```
 
+    **Python言語のファイルを導入すれば、**
+    ```
+    sudo cp ./healthchecker.py /opt/metamoji/bin/.
+    ```
+
 2. ```/etc/systemd/system/``` ディレクトリに healthchecker.service という名前の新しいサービスファイルを作成します。**[サービスファイル](./healthchecker.service)** の内容は以下のようになります。
+
+    **C言語のファイルを導入すれば、**
     ```
     [Unit]
     Description=healthchecker
@@ -24,6 +33,21 @@ ListenPortMariaDB.c をサービス化するには、以下の手順に従うこ
     [Service]
     Type=simple
     ExecStart=/opt/metamoji/bin/healthchecker 13306
+    Restart=always
+
+    [Install]
+    WantedBy=multi-user.target
+    ```
+
+    **Python言語のファイルを導入すれば、**
+    ```
+    [Unit]
+    Description=healthchecker
+    After=mariadb.service network.target
+
+    [Service]
+    Type=simple
+    ExecStart=/usr/bin/python3 /opt/metamoji/bin/healthchecker.py 13306
     Restart=always
 
     [Install]

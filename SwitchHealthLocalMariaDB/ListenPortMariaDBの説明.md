@@ -9,9 +9,18 @@ sudo systemctl start mariadb
 ```
 
 そして、**[こちら](https://github.com/metamoji/tr-nguyen-mysql/blob/main/HeathCheckProgram/%E8%AA%AC%E6%98%8E.md)** と同じように ListenPortMariaDB.c を実行するとします。
+
+**C言語の場合**
 ```
 ./ListenPortMariaDB 13306 &
 ```
+
+**Python言語の場合**
+```
+python3 healthchecker.py 13306 &
+```
+**※** ```heathchecker.py``` は Python言語で作成した```ListenPortMariaDB``` プログラムです。 
+
 以下のメッセージが出てきます。
 ```
 [ec2-user@ip-10-0-147-166 ~]$ Listening on port 13306...
@@ -51,7 +60,16 @@ nguyen-1 の例と同様にlocal は nguyen-2 として、同じ手順で行い�
 Target Groupをクリックして NLB を選択すると、登録した Target で 各Instance を確認できます。
 
 **追加:** silent な動作をdefaultにします。ListenPortMariaDB が動いていることを確認したい場合、```--debug``` を後尾に追加します。例えば、
+
+**C言語の場合**
 ```
 ./ListenPortMariaDB 13306 --debug &
 ```
-を入力すると、以下に MariaDB server is running locally のメッセージが表示されます。
+
+**Python言語の場合**
+```
+python3 healthchecker.py 13306 --debug &
+```
+**※** ```heathchecker.py``` は Python言語で作成した```ListenPortMariaDB``` プログラムです。 
+
+を入力すると、以下に ```MariaDB server is running locally``` のメッセージが表示されます。
